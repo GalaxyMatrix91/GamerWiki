@@ -1,8 +1,7 @@
 package com.goahead.actors
 
-import akka.actor.{Actor, ActorRef, ActorSystem, Props}
+import akka.actor.{Actor, ActorSystem, Props}
 import akka.http.scaladsl.Http
-import akka.http.scaladsl.server.Directives._
 import akka.stream.Materializer
 import akka.util.Timeout
 import com.goahead.models.DataBase
@@ -13,11 +12,7 @@ import com.goahead.util.db.{DatabaseConnector, DatabaseMigrationManager}
 import scala.concurrent.duration._
 import scala.concurrent.{Await, ExecutionContext}
 import com.typesafe.config.{ Config, ConfigFactory }
-/**
-  * @project supermm2wiki
-  * @author GitHCorrado
-  * @date 2019-07-19
-  */
+
 final class RoutesActor private (m: Materializer)
   extends Actor with RequestTimeout {
 
@@ -25,19 +20,34 @@ final class RoutesActor private (m: Materializer)
   implicit val executor: ExecutionContext = actorSystem.dispatcher
   implicit val materialiser: Materializer = m
 
-  val config = ConfigFactory.load()
+  //MySQL config
+  val mysql_config = ConfigFactory.load()
   new DatabaseMigrationManager(
-    config.getString("database.jdbc-url"),
-    config.getString("database.user"),
-    config.getString("database.password")
+    mysql_config.getString("database.mysql-jdbc-url"),
+    mysql_config.getString("database.mysql-user"),
+    mysql_config.getString("database.mysql-password")
   ).migrateDatabaseSchema()
-  val databaseConnector = new DatabaseConnector(
-    config.getString("database.jdbc-url"),
-    config.getString("database.user"),
-    config.getString("database.password"))
-  val db = new DataBase(databaseConnector, executor)
-  val api = new Supermm2Routes(actorSystem, requestTimeout(config), db)
-  val bindingFuture = Http().bindAndHandle(api.routes, config.getString("http.interface"), config.getInt("http.port"))
+  val mysql_databaseConnector = new DatabaseConnector(
+    mysql_config.getString("database.mysql-jdbc-url"),
+    mysql_config.getString("database.mysql-user"),
+    mysql_config.getString("database.mysql-password"))
+
+  //PostgreSQL config
+  /*  val pg_config = ConfigFactory.load()
+    new DatabaseMigrationManager(
+      pg_config.getString("database.pg-jdbc-url"),
+      pg_config.getString("database.pg-user"),
+      pg_config.getString("database.pg-password")
+    ).migrateDatabaseSchema()
+    val pg_databaseConnector = new DatabaseConnector(
+      pg_config.getString("database.pg-jdbc-url"),
+      pg_config.getString("database.pg-user"),
+      pg_config.getString("database.pg-password"))
+  */
+  val mysql_db = new DataBase(mysql_databaseConnector, executor)
+  lazy val smm2_actor = context.actorOf(Props(new Supermm2Actor(mysql_db, executor)), "Smm2_Actor")
+  val api = new Supermm2Routes(mysql_db, smm2_actor, requestTimeout(mysql_config), executor)
+  val bindingFuture = Http().bindAndHandle(api.routes, mysql_config.getString("http.interface"), mysql_config.getInt("http.port"))
 
   override def receive: Receive = { case _ => }
 

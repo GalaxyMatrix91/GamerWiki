@@ -5,11 +5,6 @@ import akka.pattern.{ BackoffOpts, BackoffSupervisor }
 import akka.stream.{ActorMaterializer, Materializer}
 
 import scala.concurrent.duration._
-/**
-  * @project supermm2wiki
-  * @author GitHCorrado
-  * @date 2019-07-19
-  */
 object MainActor {
 
   def props(worker: Materializer => Props): Props =

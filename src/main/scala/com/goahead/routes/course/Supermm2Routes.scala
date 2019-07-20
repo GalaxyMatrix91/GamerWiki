@@ -1,33 +1,26 @@
 package com.goahead.routes.course
 
-import akka.actor.{ActorRef, ActorSystem}
+import akka.actor.ActorRef
 import com.goahead.models.DataBase
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.Route
-import akka.http.scaladsl.server.directives.MethodDirectives.{get, post}
-import akka.http.scaladsl.server.directives.PathDirectives.path
+import akka.http.scaladsl.server.directives.MethodDirectives.get
 import akka.http.scaladsl.model.StatusCodes
 import akka.http.scaladsl.server.directives.RouteDirectives.complete
 import akka.util.Timeout
-import akka.pattern.ask
-import com.goahead.actors.Supermm2Actor
-import de.heikoseeberger.akkahttpcirce.CirceSupport._
-import io.circe.{Decoder, Encoder, Json}
-import io.circe.syntax._
-import com.goahead.actors.Supermm2Actor._
 import com.goahead.models.course.{Course, Courses}
+import de.heikoseeberger.akkahttpcirce.CirceSupport._
+import akka.pattern._
+import com.goahead.Errors
+import com.goahead.actors.Supermm2Actor.{FindByCourseID, GetTrendingCourses, UpdateTrendingCourse}
 
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 
-/**
-  * @project supermm2wiki
-  * @author GitHCorrado
-  * @date 2019-07-19
-  */
-class Supermm2Routes(system: ActorSystem, timeout: Timeout, db: DataBase)
-      extends Supermm2Route {
+class Supermm2Routes(db: DataBase, smm2Actor: ActorRef, timeout: Timeout, ec: ExecutionContext) extends Supermm2Route {
+  implicit val database = db
+  implicit val executionContext = ec
   implicit val requestTimeout = timeout
-  def createSupermm2Actor = system.actorOf(Supermm2Actor.props(db), "SuperMM2Actor")
+  implicit val actor = smm2Actor
 }
 
 trait Supermm2Route extends Supermm2api {
@@ -37,10 +30,18 @@ trait Supermm2Route extends Supermm2api {
     pathPrefix("wiki" / "supermm2" / "trendingtop10") {
       pathEndOrSingleSlash {
         get {
-          onSuccess(getTrendingTop10Courses()) { courses =>
-            complete(courses)
+          onSuccess(getTrendingCourses()) { courses =>
+            val trending_courses = new Courses(courses)
+            complete(trending_courses)
           }
-        }
+        } ~
+          post {
+            entity(as[Course]) { req =>
+              onSuccess(addNewTrendingCourse(req)) { i =>
+                  complete(i)
+              }
+            }
+          }
       }
     } ~
     pathPrefix("wiki") {
@@ -49,17 +50,33 @@ trait Supermm2Route extends Supermm2api {
           complete(OK)
         }
       }
+    } ~
+    pathPrefix("wiki" / "supermm2" / "findcoursebyid") {
+      (get & parameters("courseid")) {
+        param1 =>
+          onSuccess(findCourseById(FindByCourseID(param1))) {
+            case Some(course)     => complete(course)
+            case None             => complete(Errors(404, "Course Not Found"))
+          }
+      }
     }
 }
 
 trait Supermm2api {
-  import com.goahead.actors.Supermm2Actor._
+    implicit val database: DataBase
+    implicit val executionContext: ExecutionContext
+    implicit val requestTimeout: Timeout
+    val actor: ActorRef
 
-  def createSupermm2Actor(): ActorRef
-  //implicit def executionContext: ExecutionContext
-  implicit def requestTimeout: Timeout
+    def getTrendingCourses():Future[Seq[Course]] = {
+      actor.ask(GetTrendingCourses).mapTo[Seq[Course]]
+    }
 
-  lazy val supermm2actor = createSupermm2Actor()
-  def getTrendingTop10Courses() =
-    supermm2actor.ask(GetTrendingCourses).mapTo[Courses]
+    def findCourseById(form: FindByCourseID): Future[Option[Course]] = {
+      actor.ask(form).mapTo[Option[Course]]
+    }
+    def addNewTrendingCourse(req: Course):Future[Int] = {
+      actor.ask(UpdateTrendingCourse(req)).mapTo[Int]
+    }
+
 }

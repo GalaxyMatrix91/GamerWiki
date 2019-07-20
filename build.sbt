@@ -5,6 +5,16 @@ version := "0.1"
 
 organization := "com.goahead"
 
+scalacOptions ++= Seq(
+  "-deprecation",
+  "-unchecked",
+  "-Xlint",
+  "-Ywarn-unused",
+  "-Ywarn-dead-code",
+  "-feature",
+  "-language:_"
+)
+
 lazy val akkaHttpVersion = "10.1.9"
 lazy val akkaVersion    = "2.6.0-M3"
 lazy val circeVersion = "0.11.1"
@@ -12,12 +22,17 @@ lazy val slickVersion = "3.2.3"
 lazy val slickJodaMapperVersion = "2.3.0"
 val akkaCors   = "0.1.11"
 
+enablePlugins(JavaAppPackaging)
+
+scriptClasspath += "../conf"
+
 libraryDependencies ++= {
   Seq(
     "com.typesafe.akka" %% "akka-http"            % akkaHttpVersion,
     "com.typesafe.akka" %% "akka-http-spray-json" % akkaHttpVersion,
     "com.typesafe.akka" %% "akka-http-xml"        % akkaHttpVersion,
     "com.typesafe.akka" %% "akka-stream"          % akkaVersion,
+    "ch.qos.logback"    %  "logback-classic"      % "1.0.13",
     "org.joda"          % "joda-convert"          % "1.7",
     "joda-time"         %  "joda-time"            % "2.7",
     "org.joda"          % "joda-money"            % "0.10.0",
@@ -28,7 +43,9 @@ libraryDependencies ++= {
     "com.github.tototoshi" %% "slick-joda-mapper" % slickJodaMapperVersion,
     "com.github.pureconfig" %% "pureconfig"       % "0.11.1",
     "org.flywaydb"      % "flyway-core"           % "4.2.0",
-    "mysql" % "mysql-connector-java" % "8.0.16",
+    "mysql"             % "mysql-connector-java"  % "8.0.16",
+    "org.postgresql"    % "postgresql"            % "42.1.4",
+    "org.apache.poi"    % "poi-ooxml"             % "4.1.0",
 
     "com.typesafe.akka" %% "akka-http-testkit"    % akkaHttpVersion % Test,
     "com.typesafe.akka" %% "akka-testkit"         % akkaVersion     % Test,
@@ -42,4 +59,4 @@ libraryDependencies ++= Seq(
   "io.circe" %% "circe-parser"
 ).map(_ % circeVersion)
 
-// Assembly settings missing needs to be filled
+// Assembly settings

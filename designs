@@ -1,12 +1,37 @@
-#database name supermm2_wiki
-##tablename courses
-###fields
-   + course_name
-   + course_difficulty
-   + is_trending
+#postgreSQL
+##database schema supermm2_wiki
+###tablename courses
+####fields
+   + course_id                  string
+   + course_name				text
+   + course_type  				string		// URL to OSS
+   + course_image_url			string			// URL to OSS
+   + course_detail_url			string			// URL to OSS
+   + num_likes					bigint
+   + times_played				bigint
+   + clear_check_time			string
+   + creator_info				json			//creator_name, creator_avatar, creator_nationality
+     + creator_name             string
+     + creator_avatar           string          //URL to OSS
+     + creator_nationality      string          //URL to OSS
+   + tags						json			//2 tags; total tags types:9
+     + tag1                     string          //URL to OSS
+     + tag2                     string          //URL to OSS
+   + world_record_holder		json			//holder_avatar, holder_name, world_record_time
+     + holder_name              string
+     + holder_avatar            string          //URL to OSS
+     + world_record_time        string
+   + first_cleared_by			json			//person_name, person_avatar, person_nationality
+     + first_name               string
+     + first_avatar             string          //URL to OSS
+     + first_nationality        string          //URL to OSS
+   + clear_info					json			//clears; clear rate
+     + rate                     string
+     + completed                bigint
+     + total_times              bigint
 
 
 # endpoints
-##GET			/supermm2/famousfunmaps
-##GET			/supermm2/trendingmaps
-##GET			/supermm2/randomfunnymaps
+##GET			/wiki/supermm2/famousfunmaps
+##GET			/wiki/supermm2/trendingtop10
+##GET			/wiki/supermm2/randomfunnymaps
