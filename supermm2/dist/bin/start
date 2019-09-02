@@ -1,0 +1,58 @@
+#!/bin/sh
+# 启动
+
+# 当前目录，在执行完成之后要回到这个目录
+OLD=`pwd`
+BIN=`dirname $0`
+cd $BIN
+# bin 目录
+BINDIR=`pwd`
+
+cd "$BINDIR/.."
+
+Echo() {
+  date=`date "+%Y-%m-%d %H:%M:%S"`
+  echo "[$date] $1"
+}
+
+# 如果运行就退出，不启动
+PIDFILE="RUNNING_PID"
+if [[ -f $PIDFILE ]]; then
+  PID=$(head -n 1 $PIDFILE)
+  APP=`ps -p $PID | grep java`
+  # 如果有记录，则证明程序确实还在运行
+  if [[ "$APP" != "" ]]; then
+    Echo "Application is running"
+    cd $OLD
+    exit
+  fi
+  # 程序没有启动，但有 PID 文件，要删除后才能启动，否则 center 脚本不能启动程序的
+  rm $PIDFILE
+fi
+
+# load profile
+if [[ -f "$HOME/etc/env.sh" ]]; then
+  source "$HOME/etc/env.sh"
+fi
+
+# 获取内存
+OPTS=$HOME/etc/serveropts
+if [[ -f "$OPTS" ]]; then
+  source $OPTS
+fi
+SUPERMM2_MEM=${SUPERMM2_MEM:-1024}
+
+Echo "Starting application"
+#调用启动脚本
+ulimit -c 0
+$BINDIR/supermm2 \
+  -J-Xmx${SUPERMM2_MEM}m \
+  -J-Xms${SUPERMM2_MEM}m \
+  -J-Xloggc:gc.log \
+  -J-Djava.security.egd=file:/dev/./urandom \
+  -Dlogback.configurationFile=$HOME/etc/supermm2/supermm2.logger.xml \
+  -Dconfig.file=$HOME/etc/supermm2/supermm2.conf
+
+Echo "Application is started"
+#返回旧目录
+cd $OLD

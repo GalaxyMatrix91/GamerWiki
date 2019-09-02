@@ -1,62 +1,27 @@
+import NativePackagerHelper._
 
-name := "supermm2wiki"
+Common.init("Gamer-wiki")
 
-version := "0.1"
+topLevelDirectory := None
 
-organization := "com.goahead"
+//base library
+lazy val libs =
+  project.in(file("libs")).settings(Common.init("libs", isLib = true), Libs.libsDeps)
 
-scalacOptions ++= Seq(
-  "-deprecation",
-  "-unchecked",
-  "-Xlint",
-  "-Ywarn-unused",
-  "-Ywarn-dead-code",
-  "-feature",
-  "-language:_"
-)
+//supermm2
+lazy val supermm2 =
+  project
+      .in(file("supermm2"))
+      .settings(
+        Common.init("supermm2"),
+        makeBatScripts := Seq(),  // 不需要 Windows 启动脚本
+        mappings in Universal ++= (baseDirectory.value / "dist" / "conf" * "*" get) map(x => x -> ("conf/" + x.getName)),
+        mappings in Universal ++= (baseDirectory.value / "dist" / "bin" * "*" get) map(x => x -> ("bin/" + x.getName))
+      )
+      .dependsOn(libs).aggregate(libs)
+      .enablePlugins(JavaAppPackaging, UniversalPlugin)
 
-lazy val akkaHttpVersion = "10.1.9"
-lazy val akkaVersion    = "2.6.0-M3"
-lazy val circeVersion = "0.11.1"
-lazy val slickVersion = "3.2.3"
-lazy val slickJodaMapperVersion = "2.3.0"
-val akkaCors   = "0.1.11"
+enablePlugins(JavaAppPackaging, UniversalPlugin)
 
-enablePlugins(JavaAppPackaging)
-
-scriptClasspath += "../conf"
-
-libraryDependencies ++= {
-  Seq(
-    "com.typesafe.akka" %% "akka-http"            % akkaHttpVersion,
-    "com.typesafe.akka" %% "akka-http-spray-json" % akkaHttpVersion,
-    "com.typesafe.akka" %% "akka-http-xml"        % akkaHttpVersion,
-    "com.typesafe.akka" %% "akka-stream"          % akkaVersion,
-    "ch.qos.logback"    %  "logback-classic"      % "1.0.13",
-    "org.joda"          % "joda-convert"          % "1.7",
-    "joda-time"         %  "joda-time"            % "2.7",
-    "org.joda"          % "joda-money"            % "0.10.0",
-    "ch.megard"         %% "akka-http-cors"       % akkaCors,
-    "de.heikoseeberger" %% "akka-http-circe"      % "1.12.0",
-    "com.zaxxer"        % "HikariCP"              % "2.7.0",
-    "com.typesafe.slick"%% "slick"                % slickVersion,
-    "com.github.tototoshi" %% "slick-joda-mapper" % slickJodaMapperVersion,
-    "com.github.pureconfig" %% "pureconfig"       % "0.11.1",
-    "org.flywaydb"      % "flyway-core"           % "4.2.0",
-    "mysql"             % "mysql-connector-java"  % "8.0.16",
-    "org.postgresql"    % "postgresql"            % "42.1.4",
-    "org.apache.poi"    % "poi-ooxml"             % "4.1.0",
-
-    "com.typesafe.akka" %% "akka-http-testkit"    % akkaHttpVersion % Test,
-    "com.typesafe.akka" %% "akka-testkit"         % akkaVersion     % Test,
-    "com.typesafe.akka" %% "akka-stream-testkit"  % akkaVersion     % Test,
-    "org.scalatest"     %% "scalatest"            % "3.0.5"         % Test
-  )
-}
-libraryDependencies ++= Seq(
-  "io.circe" %% "circe-core",
-  "io.circe" %% "circe-generic",
-  "io.circe" %% "circe-parser"
-).map(_ % circeVersion)
-
-// Assembly settings
+mappings in (Compile, packageDoc) := Seq()
+mappings in Universal ++= directory("conf")

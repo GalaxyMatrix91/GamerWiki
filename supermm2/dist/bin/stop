@@ -1,0 +1,33 @@
+#!/bin/sh
+# 停止 Center
+
+# 当前目录，在执行完成之后要回到这个目录
+OLD=`pwd`
+BIN=`dirname $0`
+cd $BIN
+# bin 目录
+BINDIR=`pwd`
+
+Echo() {
+  date=`date "+%Y-%m-%d %H:%M:%S"`
+  echo "[$date] $1"
+}
+
+# 判断程序在运行
+PIDFILE="$BINDIR/../RUNNING_PID"
+if [[ -f $PIDFILE ]]; then
+  PID=$(head -n 1 $PIDFILE)
+  APP=`ps -p $PID | grep java`
+  # 如果有记录，则证明程序确实还在运行
+  if [[ "$APP" != "" ]]; then
+    Echo "Killing Application PID=$PID"
+    kill $PID
+    Echo "Killed"
+    cd $OLD
+    exit
+  fi
+fi
+
+Echo "Application is not running"
+#返回旧目录
+cd $OLD

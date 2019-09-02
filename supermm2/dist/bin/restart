@@ -1,0 +1,15 @@
+#!/bin/sh
+# 重启 Center
+
+# 当前目录，在执行完成之后要回到这个目录
+OLD=`pwd`
+BIN=`dirname $0`
+cd $BIN
+# bin 目录
+BINDIR=`pwd`
+
+# 调用停止和启动脚本
+$BINDIR/stop
+$BINDIR/start
+
+cd $OLD

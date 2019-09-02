@@ -1,0 +1,27 @@
+# /etc/systemd/system/linker.service
+# copy this file to /usr/lib/systemd/system/
+# systemctl enable linker
+# systemctl start linker
+#
+[Unit]
+Description=supermm2
+After=network.target remote-fs.target nss-lookup.target
+
+[Service]
+User=justgoahead
+Type=simple
+PIDFile=/home/justgoahead/supermm2/RUNNING_PID
+ExecStartPre=/bin/bash --login -c 'env > /tmp/.supermm2-profile-file'
+# The "-" before the filename seems to make systemd ignore the error if the file is not there
+# (for example, on the first run of the pre command). Now, obviously, you could just set your
+# ~some-user/.bashrc as the EnvironmentFile - but your mileage will vary. systemd will not
+# interpolate variables and it will ignore lines starting with "export"...
+EnvironmentFile=-/tmp/.supermm2-profile-file
+ExecStart=/home/justgoahead/supermm2/bin/start
+ExecReload=/bin/kill -HUP $MAINPID
+KillMode=process
+Restart=always
+RestartSec=1s
+
+[Install]
+WantedBy=multi-user.target
