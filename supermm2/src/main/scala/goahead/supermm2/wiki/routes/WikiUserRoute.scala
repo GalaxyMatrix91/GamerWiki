@@ -14,8 +14,30 @@ final case class WikiUserRoute(actors: Actors) extends Supermm2Route(actors) {
 
   override def jsonHandler: JAction = {
     case HttpAction("Supermm2Wiki.GetTopTrendingCourses")       => getTopTrendingCourses
+    case HttpAction("Supermm2Wiki.GetCourseById")               => getCourseById
+    case HttpAction("Supermm2Wiki.AddCourse")                   => addCourse
+    case HttpAction("Supermm2Wiki.UpdateCourse")                => updateCourse
   }
 
   def getTopTrendingCourses(req: Supermm2Message): Future[Seq[Course]] =
     WikiUserActor.ask(GetTopTrendingCourses).mapTo[Seq[Course]]
+
+  def getCourseById(req: Supermm2Message): Future[Option[Course]] = {
+    withForm(req.body) { form: QueryCourseForm =>
+      WikiUserActor.ask(form).mapTo[Option[Course]]
+    }
+  }
+
+  def addCourse(req: Supermm2Message): Future[Course] = {
+    withForm(req.body) { form: AddCourseForm =>
+      WikiUserActor.ask(form).mapTo[Course]
+    }
+  }
+
+  def updateCourse(req: Supermm2Message): Future[Boolean] = {
+    withForm(req.body) { form: UpdateCourseForm =>
+      WikiUserActor.ask(form).mapTo[Boolean]
+    }
+  }
+
 }

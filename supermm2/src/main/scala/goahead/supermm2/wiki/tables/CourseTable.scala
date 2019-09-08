@@ -104,4 +104,42 @@ final class CourseDao(implicit schema: DBSchema, ec: ExecutionContext) {
 
   def findByCourseId(course_id: String): DBIO[Option[Course]] =
     table.filter(_.id === course_id).result.headOption
+
+  def add(course: Course):DBIO[Course] = {
+    val c = Course(
+      course_id = course.course_id,
+      course_name = course.course_name,
+      course_type = course.course_type,
+      course_image_url = course.course_image_url,
+      course_detail_url = course.course_detail_url,
+      num_likes = course.num_likes,
+      times_played = course.times_played,
+      clear_check_time = course.clear_check_time,
+      creator = course.creator,
+      tag1 = course.tag1,
+      tag2 = course.tag2,
+      world_record_holder = course.world_record_holder,
+      wr_time = course.wr_time,
+      first_player = course.first_player,
+      clear_rate = course.clear_rate,
+      completed = course.completed,
+      total_times = course.total_times,
+      oss_image_url = course.oss_image_url,
+      oss_image_detail_url = course.oss_image_detail_url
+    )
+    auto += c
+  }
+
+  def update(course: Course):DBIO[Boolean] = {
+    table.filter(_.id === course.course_id).map(a =>
+      (a.courseName, a.courseType, a.courseImageUrl, a.courseDetailUrl, a.numLikes, a.timesPlayed,
+        a.clearCheckTime, (a.creatorName, a.creatorAvatar, a.creatorNationality), a.tag1, a.tag2,
+      (a.wrHolderName, a.wrHolderAvatar, a.wrHolderNationality), a.wrTime, (a.firstName, a.firstAvatar, a.firstNationality), a.clearRate,
+      a.completed, a.totalTimes, a.ossImageUrl, a.ossImageDetailUrl)).update(
+      (course.course_name, course.course_type, course.course_image_url, course.course_detail_url, course.num_likes, course.times_played,
+      course.clear_check_time, (course.creator.creator_name, course.creator.creator_avatar, course.creator.creator_nationality),
+      course.tag1, course.tag2, (course.world_record_holder.name, course.world_record_holder.avatar, course.world_record_holder.nationality),
+      course.wr_time, (course.first_player.name, course.first_player.avatar, course.first_player.nationality), course.clear_rate, course.completed,
+      course.total_times, course.oss_image_url, course.oss_image_detail_url)).map(_ > 0)
+  }
 }
