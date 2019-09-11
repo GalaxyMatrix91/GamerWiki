@@ -90,10 +90,19 @@ final class MakerDao(implicit schema: DBSchema, ec: ExecutionContext) {
 
   def update(maker: Maker): DBIO[Boolean] = {
     table.filter(_.id === maker.maker_id).map(a =>
-      (a.makerName, a.makerPoint, a.makerPoint, a.makerAvatar, a.makerNationality, a.makerProfileImage,
+      (a.makerName, a.makerPoint, a.makerAvatar, a.makerNationality, a.makerProfileImage,
       a.ecEasyHighScore, a.ecNormalHighScore, a.ecExpertHighScore, a.ecSuperExpertHighScore, a.mvWins,
       a.mvPlays, a.mcoClears, a.mcoPlays, a.phCoursesPlayed, a.phCoursesCleared, a.phAttempts, a.phLivesLost,
       a.ossMakerImage, a.ossMakerDetailImage)
-    ).update((maker.maker_name, maker.maker_point,))
+    ).update((maker.maker_name, maker.maker_point, maker.maker_avatar, maker.maker_nationality,
+    maker.maker_profile_image, maker.ec_easy_high_score, maker.ec_normal_high_score, maker.ec_expert_high_score,
+    maker.ec_super_expert_high_score, maker.mv_wins, maker.mv_plays, maker.mco_clears, maker.mco_plays,
+      maker.ph_courses_played, maker.ph_courses_cleared, maker.ph_attempts, maker.ph_lives_lost,
+      maker.oss_maker_image, maker.oss_maker_detail_image)).map(_ > 0)
   }
+
+  def findByMakerId(makerid: String): DBIO[Option[Maker]] = {
+    table.filter(_.id === makerid).result.headOption
+  }
+
 }
