@@ -101,6 +101,9 @@ final class MakerDao(implicit schema: DBSchema, ec: ExecutionContext) {
       maker.oss_maker_image, maker.oss_maker_detail_image)).map(_ > 0)
   }
 
+  def insertOrUpdate(maker: Maker): DBIO[Maker] =
+    table.insertOrUpdate(maker).map(_ => maker)
+
   def findByMakerId(makerid: String): DBIO[Option[Maker]] = {
     table.filter(_.id === makerid).result.headOption
   }

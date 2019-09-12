@@ -13,22 +13,22 @@ import goahead.supermm2.jmodel._
 final case class WikiUserRoute(actors: Actors) extends Supermm2Route(actors) {
   import actors._
 
-  implicit val AdminJson = Jsons.format[Admin]
-
   override def jsonHandler: JAction = {
     case HttpAction("Supermm2Wiki.GetTopTrendingCourses")       => getTopTrendingCourses
     case HttpAction("Supermm2Wiki.GetCourseById")               => getCourseById
-    case HttpAction("Supermm2Wiki.AddCourse")                   => addCourse
-    case HttpAction("Supermm2Wiki.UpdateCourse")                => updateCourse
     case HttpAction("Supermm2Wiki.GetTopMakersDesc")            => getTopMakersDesc
-    case HttpAction("Supermm2Wiki.SignUp")                      => signUp
+    case HttpAction("Supermm2Wiki.GetMakerById")                => getMakerById
+    //case HttpAction("Supermm2Wiki.SignUp")                      => signUp
   }
 
+  /*
   def signUp(req: Supermm2Message): Future[Admin] = {
     withForm(req.body) { form: SignUp =>
       WikiActor.ask(form).mapTo[Admin]
     }
   }
+
+   */
 
   def getTopTrendingCourses(req: Supermm2Message): Future[Seq[Course]] =
     WikiActor.ask(GetTopTrendingCourses).mapTo[Seq[Course]]
@@ -39,19 +39,14 @@ final case class WikiUserRoute(actors: Actors) extends Supermm2Route(actors) {
     }
   }
 
-  def addCourse(req: Supermm2Message): Future[Course] = {
-    withForm(req.body) { form: AddCourseForm =>
-      WikiActor.ask(form).mapTo[Course]
-    }
-  }
-
-  def updateCourse(req: Supermm2Message): Future[Boolean] = {
-    withForm(req.body) { form: UpdateCourseForm =>
-      WikiActor.ask(form).mapTo[Boolean]
-    }
-  }
-
   def getTopMakersDesc(req: Supermm2Message): Future[Seq[Maker]] = {
     WikiActor.ask(GetTopMakers).mapTo[Seq[Maker]]
   }
+
+  def getMakerById(req: Supermm2Message): Future[Option[Maker]] = {
+    withForm(req.body) { form: QueryMakerForm =>
+      WikiActor.ask(form).mapTo[Option[Maker]]
+    }
+  }
+
 }

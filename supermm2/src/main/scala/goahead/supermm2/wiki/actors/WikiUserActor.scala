@@ -18,10 +18,12 @@ object WikiUserActor {
   final case class QueryCourseForm(course_id: String) extends WikiUserMessage
   final case class AddCourseForm(course: Course) extends WikiUserMessage
   final case class UpdateCourseForm(course: Course) extends WikiUserMessage
+  final case class UploadCourseForm(course: Course) extends WikiUserMessage
   final case object GetTopMakers extends WikiUserMessage
   final case class QueryMakerForm(maker_id: String) extends WikiUserMessage
   final case class AddMakerForm(maker: Maker) extends WikiUserMessage
   final case class UpdateMakerForm(maker: Maker) extends WikiUserMessage
+  final case class UploadMakerForm(maker: Maker) extends WikiUserMessage
   final case class SignUp(account: String, password: String) extends WikiUserMessage
 }
 
@@ -37,16 +39,15 @@ final class WikiUserActor(ctx: Context)(implicit mat: Materializer) extends Acto
   override def receive: Receive = {
     case GetTopTrendingCourses   => getTopTrendingCourses().pipeTo(sender())
     case form: QueryCourseForm   => findCourseByCourseId(form).pipeTo(sender())
-    case form: AddCourseForm     => addCourse(form).pipeTo(sender())
-    case form: UpdateCourseForm  => updateCourse(form).pipeTo(sender())
+    case form: UploadCourseForm  => uploadCourse(form).pipeTo(sender())
+
     case GetTopMakers            => getTopMakers().pipeTo(sender())
     case form: QueryMakerForm    => findMakerByMakerId(form).pipeTo(sender())
-    case form: AddMakerForm      => addMaker(form).pipeTo(sender())
-    case form: UpdateMakerForm   => updateMaker(form).pipeTo(sender())
-    case form: SignUp            => signUp(form).pipeTo(sender())
+    case form: UploadMakerForm   => uploadMaker(form).pipeTo(sender())
+    //case form: SignUp            => signUp(form).pipeTo(sender())           // 注册Admin
   }
 
-  def signUp(form: SignUp) = {
+  def signUp(form: SignUp): Future[Admin] = {
     val adminRole = Role(
       id = RoleID(0),
       token = Token.millis("ROLE"),
@@ -81,12 +82,12 @@ final class WikiUserActor(ctx: Context)(implicit mat: Materializer) extends Acto
   def findCourseByCourseId(form: QueryCourseForm): Future[Option[Course]] =
     DB.run(CourseDao.findByCourseId(form.course_id))
 
-  def addCourse(form: AddCourseForm): Future[Course] = {
-    DB.run(CourseDao.add(form.course))
-  }
-
-  def updateCourse(form: UpdateCourseForm): Future[Boolean] = {
-    DB.run(CourseDao.update(form.course))
+  def uploadCourse(form: UploadCourseForm): Future[Course] = {
+    val q = CourseDao.findByCourseId(form.course.course_id).flatMap {
+      case Some(course) => CourseDao.insertOrUpdate(form.course)
+      case None         => CourseDao.add(form.course)
+    }
+    DB.runt(q)
   }
 
   def getTopMakers(): Future[Seq[Maker]] =
@@ -95,10 +96,12 @@ final class WikiUserActor(ctx: Context)(implicit mat: Materializer) extends Acto
   def findMakerByMakerId(form: QueryMakerForm): Future[Option[Maker]] =
     DB.run(MakerDao.findByMakerId(form.maker_id))
 
-  def addMaker(form: AddMakerForm): Future[Maker] =
-    DB.run(MakerDao.add(form.maker))
-
-  def updateMaker(form: UpdateMakerForm): Future[Boolean] =
-    DB.run(MakerDao.update(form.maker))
+  def uploadMaker(form: UploadMakerForm): Future[Maker] = {
+    val q = MakerDao.findByMakerId(form.maker.maker_id).flatMap {
+      case Some(maker) => MakerDao.insertOrUpdate(form.maker)
+      case None        => MakerDao.add(form.maker)
+    }
+    DB.runt(q)
+  }
 
 }
