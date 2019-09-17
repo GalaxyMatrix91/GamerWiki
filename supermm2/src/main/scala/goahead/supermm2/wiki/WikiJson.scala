@@ -1,6 +1,6 @@
 package goahead.supermm2.wiki
 
-import goahead.libs.json._
+import goahead.libs.json.{Jsons, _}
 import goahead.supermm2.wiki.models._
 import goahead.supermm2.wiki.actors.WikiUserActor._
 
@@ -21,4 +21,5 @@ trait WikiJson extends JsonTrait {
   //implicit val AdminJson = Jsons.format[Admin]
   implicit val UploadCourseFormJson = Jsons.format[UploadCourseForm]
   implicit val UploadMakerFormJson = Jsons.format[UploadMakerForm]
+  implicit val FileReplyJson = Jsons.format[FileReply]
 }
