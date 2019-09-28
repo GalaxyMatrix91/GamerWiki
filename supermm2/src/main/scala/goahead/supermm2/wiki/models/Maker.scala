@@ -39,6 +39,9 @@ final case class Maker(
                       ph_courses_cleared: Long,
                       ph_attempts: Long,
                       ph_lives_lost: Long,
+                      versus_rating_score: Long,
                       oss_maker_image: Option[String],
                       oss_maker_detail_image: Option[String]
 )
+
+final case class Makers(makers: Seq[Maker])

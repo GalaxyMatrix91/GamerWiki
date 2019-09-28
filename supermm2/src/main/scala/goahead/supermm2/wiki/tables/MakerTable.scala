@@ -45,13 +45,14 @@ final case class MakerTable(stag: Tag)(implicit schema: DBSchema) extends Table[
   def phCoursesCleared = column[Long]("ph_courses_cleared")
   def phAttempts = column[Long]("ph_attempts")
   def phLivesLost = column[Long]("ph_lives_lost")
+  def versusRatingScore = column[Long]("versus_rating_score")
   def ossMakerImage = column[Option[String]]("oss_maker_image")
   def ossMakerDetailImage = column[Option[String]]("oss_maker_detail_image")
 
   def * = (id, makerName, makerPoint, makerAvatar,
   makerNationality, makerProfileImage, ecEasyHighScore, ecNormalHighScore, ecExpertHighScore,
   ecSuperExpertHighScore, mvWins, mvPlays, mcoClears, mcoPlays, phCoursesPlayed,
-  phCoursesCleared, phAttempts, phLivesLost, ossMakerImage, ossMakerDetailImage).shaped <>
+  phCoursesCleared, phAttempts, phLivesLost, versusRatingScore, ossMakerImage, ossMakerDetailImage).shaped <>
     (Maker.tupled, Maker.unapply)
 }
 
@@ -79,6 +80,7 @@ final class MakerDao(implicit schema: DBSchema, ec: ExecutionContext) {
       ph_courses_cleared = maker.ph_courses_cleared,
       ph_attempts = maker.ph_attempts,
       ph_lives_lost = maker.ph_lives_lost,
+      versus_rating_score = maker.versus_rating_score,
       oss_maker_image = maker.oss_maker_image,
       oss_maker_detail_image = maker.oss_maker_detail_image
     )
@@ -87,6 +89,9 @@ final class MakerDao(implicit schema: DBSchema, ec: ExecutionContext) {
 
   def getAllMakersByPointsDesc(): DBIO[Seq[Maker]] =
     table.sortBy(_.makerPoint.desc).result
+
+  def getAllMakersByVersusRatingScoreDesc(): DBIO[Seq[Maker]] =
+    table.sortBy(_.versusRatingScore.desc).result
 
   def update(maker: Maker): DBIO[Boolean] = {
     table.filter(_.id === maker.maker_id).map(a =>

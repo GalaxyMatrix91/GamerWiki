@@ -25,6 +25,8 @@ object WikiUserActor {
   final case class UpdateMakerForm(maker: Maker) extends WikiUserMessage
   final case class UploadMakerForm(maker: Maker) extends WikiUserMessage
   final case class SignUp(account: String, password: String) extends WikiUserMessage
+  final case object GetAllPoisonCourses extends WikiUserMessage
+  final case object GetAllMakersByVersusRatingScore extends WikiUserMessage
 }
 
 final class WikiUserActor(ctx: Context)(implicit mat: Materializer) extends ActorTrait {
@@ -40,10 +42,11 @@ final class WikiUserActor(ctx: Context)(implicit mat: Materializer) extends Acto
     case GetTopTrendingCourses   => getTopTrendingCourses().pipeTo(sender())
     case form: QueryCourseForm   => findCourseByCourseId(form).pipeTo(sender())
     case form: UploadCourseForm  => uploadCourse(form).pipeTo(sender())
-
+    case GetAllPoisonCourses     => getAllPoisonCourses().pipeTo(sender())
     case GetTopMakers            => getTopMakers().pipeTo(sender())
     case form: QueryMakerForm    => findMakerByMakerId(form).pipeTo(sender())
     case form: UploadMakerForm   => uploadMaker(form).pipeTo(sender())
+    case GetAllMakersByVersusRatingScore => getAllMakersByVersusRatingScore().pipeTo(sender())
     //case form: SignUp            => signUp(form).pipeTo(sender())           // 注册Admin
   }
 
@@ -75,8 +78,23 @@ final class WikiUserActor(ctx: Context)(implicit mat: Materializer) extends Acto
     DB.runt(q)
   }
 
-  def getTopTrendingCourses(): Future[Seq[Course]] = {
-    DB.run(CourseDao.getAllCourses())
+  def getAllMakersByVersusRatingScore(): Future[Makers] = {
+    DB.run(MakerDao.getAllMakersByVersusRatingScoreDesc()).map {
+      makers =>
+      Makers(makers)
+    }
+  }
+  def getAllPoisonCourses(): Future[Courses] = {
+    DB.run(CourseDao.getAllPoisonCourses).map {
+      courses =>
+      Courses(courses)
+    }
+  }
+  def getTopTrendingCourses(): Future[Courses] = {
+    DB.run(CourseDao.getAllCourses()).map {
+      courses =>
+      Courses(courses)
+    }
   }
 
   def findCourseByCourseId(form: QueryCourseForm): Future[Option[Course]] =
@@ -90,8 +108,10 @@ final class WikiUserActor(ctx: Context)(implicit mat: Materializer) extends Acto
     DB.runt(q)
   }
 
-  def getTopMakers(): Future[Seq[Maker]] =
-    DB.run(MakerDao.getAllMakersByPointsDesc())
+  def getTopMakers(): Future[Makers] =
+    DB.run(MakerDao.getAllMakersByPointsDesc()).map { makers =>
+      Makers(makers)
+    }
 
   def findMakerByMakerId(form: QueryMakerForm): Future[Option[Maker]] =
     DB.run(MakerDao.findByMakerId(form.maker_id))

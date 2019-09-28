@@ -4,7 +4,7 @@ package routes
 
 import akka.pattern._
 import goahead.libs.model._
-import goahead.supermm2.wiki.models.{Admin, Course, Maker}
+import goahead.supermm2.wiki.models._
 import goahead.supermm2.wiki.actors.WikiUserActor._
 import akka.http.scaladsl.server.Route
 import scala.concurrent.Future
@@ -23,10 +23,16 @@ final case class WikiUserRoute(webRoot: String, actors: Actors) extends Supermm2
 
   override def otherRoute: Route = {
     (get & path(webRoot / "Supermm2Wiki.GetTopTrendingCourses")) {
-      WikiActor.ask(GetTopTrendingCourses).mapTo[Seq[Course]]
+      WikiActor.ask(GetTopTrendingCourses).mapTo[Courses]
     } ~
       (get & path(webRoot / "Supermm2Wiki.GetTopMakersDesc")) {
-        WikiActor.ask(GetTopMakers).mapTo[Seq[Maker]]
+        WikiActor.ask(GetTopMakers).mapTo[Makers]
+      } ~
+      (get & path(webRoot / "Supermm2Wiki.GetAllPoisonCourses")) {
+        WikiActor.ask(GetAllPoisonCourses).mapTo[Courses]
+      } ~
+      (get & path(webRoot / "Supermm2Wiki.GetAllMakersByVersusRatingScore")) {
+        WikiActor.ask(GetAllMakersByVersusRatingScore).mapTo[Makers]
       }
   }
   /*

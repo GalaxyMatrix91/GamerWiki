@@ -1,5 +1,6 @@
 package goahead.supermm2.wiki.models
 
+final case class Courses(courses: Seq[Course])
 final case class Course(
                    course_id: String,
                    course_name: String,
@@ -18,6 +19,7 @@ final case class Course(
                    clear_rate: String,
                    completed: Long,
                    total_times: Long,
+                   is_poison: Int,
                    oss_image_url: Option[String],
                    oss_image_detail_url: Option[String]
                  )

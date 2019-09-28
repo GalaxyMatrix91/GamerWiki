@@ -75,23 +75,25 @@ final class CourseTable(stag: Tag)(implicit schema: DBSchema) extends Table[Cour
 
   def totalTimes = column[Long]("total_times")
 
+  def isPoison = column[Int]("is_poison")
+
   def ossImageUrl = column[Option[String]]("oss_image_url")
 
   def ossImageDetailUrl = column[Option[String]]("oss_image_detail_url")
 
   def * = (id, courseName, courseType, courseImageUrl, courseDetailUrl, numLikes, timesPlayed,
     clearCheckTime, (creatorName, creatorAvatar, creatorNationality), tag1, tag2, (wrHolderName, wrHolderAvatar, wrHolderNationality),
-    wrTime, (firstName, firstAvatar, firstNationality), clearRate, completed, totalTimes, ossImageUrl, ossImageDetailUrl).shaped <>
+    wrTime, (firstName, firstAvatar, firstNationality), clearRate, completed, totalTimes, isPoison, ossImageUrl, ossImageDetailUrl).shaped <>
     ( {
       case (id, courseName, courseType, courseImageUrl, courseDetailUrl, numLikes, timesPlayed,
-      clearCheckTime, t1, tag1, tag2, t2, wrTime, t3, clearRate, completed, totalTimes, ossImageUrl, ossImageDetailUrl) =>
+      clearCheckTime, t1, tag1, tag2, t2, wrTime, t3, clearRate, completed, totalTimes, isPoison, ossImageUrl, ossImageDetailUrl) =>
         Course(id, courseName, courseType, courseImageUrl, courseDetailUrl, numLikes, timesPlayed,
-          clearCheckTime, Creator(t1._1, t1._2, t1._3), tag1, tag2, Player(t2._1, t2._2, t2._3), wrTime, Player(t3._1, t3._2, t3._3), clearRate, completed, totalTimes, ossImageUrl, ossImageDetailUrl)
+          clearCheckTime, Creator(t1._1, t1._2, t1._3), tag1, tag2, Player(t2._1, t2._2, t2._3), wrTime, Player(t3._1, t3._2, t3._3), clearRate, completed, totalTimes, isPoison, ossImageUrl, ossImageDetailUrl)
     }, {
       c: Course =>
         Some((c.course_id, c.course_name, c.course_type, c.course_image_url, c.course_detail_url, c.num_likes, c.times_played, c.clear_check_time, (c.creator.creator_name,
           c.creator.creator_avatar, c.creator.creator_nationality), c.tag1, c.tag2, (c.world_record_holder.name, c.world_record_holder.avatar, c.world_record_holder.nationality),
-          c.wr_time, (c.first_player.name, c.first_player.avatar, c.first_player.nationality), c.clear_rate, c.completed, c.total_times, c.oss_image_url, c.oss_image_detail_url))
+          c.wr_time, (c.first_player.name, c.first_player.avatar, c.first_player.nationality), c.clear_rate, c.completed, c.total_times, c.is_poison, c.oss_image_url, c.oss_image_detail_url))
     })
 }
 
@@ -101,6 +103,9 @@ final class CourseDao(implicit schema: DBSchema, ec: ExecutionContext) {
 
   def getAllCourses():DBIO[Seq[Course]] =
     table.sortBy(_.id).result
+
+  def getAllPoisonCourses:DBIO[Seq[Course]] =
+    table.filter(_.isPoison === 1).result
 
   def findByCourseId(course_id: String): DBIO[Option[Course]] =
     table.filter(_.id === course_id).result.headOption
@@ -124,6 +129,7 @@ final class CourseDao(implicit schema: DBSchema, ec: ExecutionContext) {
       clear_rate = course.clear_rate,
       completed = course.completed,
       total_times = course.total_times,
+      is_poison = course.is_poison,
       oss_image_url = course.oss_image_url,
       oss_image_detail_url = course.oss_image_detail_url
     )
