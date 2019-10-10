@@ -19,6 +19,7 @@ trait CorsSupport {
   //this directive adds access control headers to normal responses
   private def addAccessControlHeaders: Directive0 = {
     respondWithHeaders(
+      //`Access-Control-Allow-Origin`.apply(HttpOrigin("http", "127.0.0.1")),
       `Access-Control-Allow-Origin`.*,
       `Access-Control-Allow-Credentials`(true),
       `Access-Control-Allow-Headers`("Authorization", "Content-Type", "X-Requested-With")
