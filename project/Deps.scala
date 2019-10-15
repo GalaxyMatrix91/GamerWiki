@@ -38,7 +38,7 @@ object Deps {
   val pgSlick = "com.github.tminglei" %% "slick-pg" % PgSlickV
   val pgSlickJson = "com.github.tminglei" %% "slick-pg_circe-json" % PgSlickV
   val pgSlickJts = "com.github.tminglei" %% "slick-pg_jts" % PgSlickV
-  val pg = "org.postgresql" % "postgresql" % "42.2.6"
+  val pg = "org.postgresql" % "postgresql" % "42.2.8"
   val h2 = "com.h2database" % "h2" % "1.4.199"
   val mysql = "mysql" % "mysql-connector-java" % "5.1.47"
 
