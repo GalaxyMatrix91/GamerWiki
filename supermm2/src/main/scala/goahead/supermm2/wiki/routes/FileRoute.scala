@@ -18,7 +18,6 @@ final case class FileRoute(webRoot: String, actors: Actors) extends Supermm2Rout
 
 
   override def otherRoute: Route = (post & path(webRoot / "upload-private")) {
-    auth { _ =>
       uploadFiles { f =>
         logger.debug("FormField: {}", f)
         val ext = FilenameUtils.getExtension(f.fileName.get)
@@ -33,6 +32,6 @@ final case class FileRoute(webRoot: String, actors: Actors) extends Supermm2Rout
           Json.obj("files" -> Jsons.toJson(r))
         }
       }
-    }
+
   }
 }

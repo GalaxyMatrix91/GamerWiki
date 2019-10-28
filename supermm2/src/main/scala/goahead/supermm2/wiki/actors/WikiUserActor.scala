@@ -14,18 +14,22 @@ import akka.pattern._
 import goahead.libs.model.{Hidden, Randoms, Token}
 
 object WikiUserActor {
+  //人气排行榜地图  官方的
   final case object GetTopTrendingCourses extends WikiUserMessage
   final case class QueryCourseForm(course_id: String) extends WikiUserMessage
   final case class AddCourseForm(course: Course) extends WikiUserMessage
   final case class UpdateCourseForm(course: Course) extends WikiUserMessage
   final case class UploadCourseForm(course: Course) extends WikiUserMessage
+  //按关卡工匠点数 降序排列 Maker  官方的
   final case object GetTopMakers extends WikiUserMessage
   final case class QueryMakerForm(maker_id: String) extends WikiUserMessage
   final case class AddMakerForm(maker: Maker) extends WikiUserMessage
   final case class UpdateMakerForm(maker: Maker) extends WikiUserMessage
   final case class UploadMakerForm(maker: Maker) extends WikiUserMessage
   final case class SignUp(account: String, password: String) extends WikiUserMessage
+  //所有的毒图 网上的
   final case object GetAllPoisonCourses extends WikiUserMessage
+  //按对战积分 降序排列 Maker 官方的
   final case object GetAllMakersByVersusRatingScore extends WikiUserMessage
 }
 
@@ -39,15 +43,15 @@ final class WikiUserActor(ctx: Context)(implicit mat: Materializer) extends Acto
   override def postStop():Unit = {}
 
   override def receive: Receive = {
-    case GetTopTrendingCourses   => getTopTrendingCourses().pipeTo(sender())
-    case form: QueryCourseForm   => findCourseByCourseId(form).pipeTo(sender())
-    case form: UploadCourseForm  => uploadCourse(form).pipeTo(sender())
-    case GetAllPoisonCourses     => getAllPoisonCourses().pipeTo(sender())
-    case GetTopMakers            => getTopMakers().pipeTo(sender())
-    case form: QueryMakerForm    => findMakerByMakerId(form).pipeTo(sender())
-    case form: UploadMakerForm   => uploadMaker(form).pipeTo(sender())
-    case GetAllMakersByVersusRatingScore => getAllMakersByVersusRatingScore().pipeTo(sender())
-    //case form: SignUp            => signUp(form).pipeTo(sender())           // 注册Admin
+    case GetTopTrendingCourses                => getTopTrendingCourses.pipeTo(sender())
+    case form: QueryCourseForm                => findCourseByCourseId(form).pipeTo(sender())
+    case form: UploadCourseForm               => uploadCourse(form).pipeTo(sender())
+    case GetAllPoisonCourses                  => getAllPoisonCourses.pipeTo(sender())
+    case GetTopMakers                         => getTopMakers.pipeTo(sender())
+    case form: QueryMakerForm                 => findMakerByMakerId(form).pipeTo(sender())
+    case form: UploadMakerForm                => uploadMaker(form).pipeTo(sender())
+    case GetAllMakersByVersusRatingScore      => getAllMakersByVersusRatingScore.pipeTo(sender())
+    //case form: SignUp                       => signUp(form).pipeTo(sender())           // 注册Admin
   }
 
   def signUp(form: SignUp): Future[Admin] = {
@@ -78,19 +82,21 @@ final class WikiUserActor(ctx: Context)(implicit mat: Materializer) extends Acto
     DB.runt(q)
   }
 
-  def getAllMakersByVersusRatingScore(): Future[Makers] = {
+  def getAllMakersByVersusRatingScore: Future[Makers] = {
     DB.run(MakerDao.getAllMakersByVersusRatingScoreDesc()).map {
       makers =>
       Makers(makers)
     }
   }
-  def getAllPoisonCourses(): Future[Courses] = {
+
+  def getAllPoisonCourses: Future[Courses] = {
     DB.run(CourseDao.getAllPoisonCourses).map {
       courses =>
       Courses(courses)
     }
   }
-  def getTopTrendingCourses(): Future[Courses] = {
+
+  def getTopTrendingCourses: Future[Courses] = {
     DB.run(CourseDao.getAllCourses()).map {
       courses =>
       Courses(courses)
@@ -108,7 +114,7 @@ final class WikiUserActor(ctx: Context)(implicit mat: Materializer) extends Acto
     DB.runt(q)
   }
 
-  def getTopMakers(): Future[Makers] =
+  def getTopMakers: Future[Makers] =
     DB.run(MakerDao.getAllMakersByPointsDesc()).map { makers =>
       Makers(makers)
     }

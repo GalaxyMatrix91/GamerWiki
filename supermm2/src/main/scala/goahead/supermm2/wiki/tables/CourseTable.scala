@@ -31,29 +31,29 @@ import scala.concurrent.ExecutionContext
 final class CourseTable(stag: Tag)(implicit schema: DBSchema) extends Table[Course](stag, Option(schema.supermm2), "courses") {
   def id = column[String]("course_id", O.PrimaryKey)
 
-  def courseName = column[String]("course_name")
+  def courseName = column[Option[String]]("course_name")
 
-  def courseType = column[String]("course_type")
+  def courseType = column[Option[String]]("course_type")
 
-  def courseImageUrl = column[String]("course_image_url")
+  def courseImageUrl = column[Option[String]]("course_image_url")
 
-  def courseDetailUrl = column[String]("course_detail_url")
+  def courseDetailUrl = column[Option[String]]("course_detail_url")
 
-  def numLikes = column[Long]("num_likes")
+  def numLikes = column[Option[Long]]("num_likes")
 
-  def timesPlayed = column[Long]("times_played")
+  def timesPlayed = column[Option[Long]]("times_played")
 
-  def clearCheckTime = column[String]("clear_check_time")
+  def clearCheckTime = column[Option[String]]("clear_check_time")
 
-  def creatorName = column[String]("creator_name")
+  def creatorName = column[Option[String]]("creator_name")
 
-  def creatorAvatar = column[String]("creator_avatar")
+  def creatorAvatar = column[Option[String]]("creator_avatar")
 
-  def creatorNationality = column[String]("creator_nationality")
+  def creatorNationality = column[Option[String]]("creator_nationality")
 
-  def tag1 = column[String]("tag1")
+  def tag1 = column[Option[String]]("tag1")
 
-  def tag2 = column[String]("tag2")
+  def tag2 = column[Option[String]]("tag2")
 
   def wrHolderName = column[Option[String]]("wr_holder_name")
 
@@ -69,13 +69,13 @@ final class CourseTable(stag: Tag)(implicit schema: DBSchema) extends Table[Cour
 
   def firstNationality = column[Option[String]]("first_nationality")
 
-  def clearRate = column[String]("clear_rate")
+  def clearRate = column[Option[String]]("clear_rate")
 
-  def completed = column[Long]("completed")
+  def completed = column[Option[Long]]("completed")
 
-  def totalTimes = column[Long]("total_times")
+  def totalTimes = column[Option[Long]]("total_times")
 
-  def isPoison = column[Int]("is_poison")
+  def isPoison = column[Option[Int]]("is_poison")
 
   def ossImageUrl = column[Option[String]]("oss_image_url")
 
@@ -88,12 +88,14 @@ final class CourseTable(stag: Tag)(implicit schema: DBSchema) extends Table[Cour
       case (id, courseName, courseType, courseImageUrl, courseDetailUrl, numLikes, timesPlayed,
       clearCheckTime, t1, tag1, tag2, t2, wrTime, t3, clearRate, completed, totalTimes, isPoison, ossImageUrl, ossImageDetailUrl) =>
         Course(id, courseName, courseType, courseImageUrl, courseDetailUrl, numLikes, timesPlayed,
-          clearCheckTime, Creator(t1._1, t1._2, t1._3), tag1, tag2, Player(t2._1, t2._2, t2._3), wrTime, Player(t3._1, t3._2, t3._3), clearRate, completed, totalTimes, isPoison, ossImageUrl, ossImageDetailUrl)
+          clearCheckTime, Some(Creator(t1._1, t1._2, t1._3)), tag1, tag2, Some(Player(t2._1, t2._2, t2._3)), wrTime, Some(Player(t3._1, t3._2, t3._3)), clearRate, completed, totalTimes, isPoison, ossImageUrl, ossImageDetailUrl)
     }, {
       c: Course =>
-        Some((c.course_id, c.course_name, c.course_type, c.course_image_url, c.course_detail_url, c.num_likes, c.times_played, c.clear_check_time, (c.creator.creator_name,
-          c.creator.creator_avatar, c.creator.creator_nationality), c.tag1, c.tag2, (c.world_record_holder.name, c.world_record_holder.avatar, c.world_record_holder.nationality),
-          c.wr_time, (c.first_player.name, c.first_player.avatar, c.first_player.nationality), c.clear_rate, c.completed, c.total_times, c.is_poison, c.oss_image_url, c.oss_image_detail_url))
+        Some((c.course_id, c.course_name, c.course_type, c.course_image_url,
+          c.course_detail_url, c.num_likes, c.times_played, c.clear_check_time,
+          (c.creator.get.creator_name,
+          c.creator.get.creator_avatar, c.creator.get.creator_nationality), c.tag1, c.tag2, (c.world_record_holder.get.name, c.world_record_holder.get.avatar, c.world_record_holder.get.nationality),
+          c.wr_time, (c.first_player.get.name, c.first_player.get.avatar, c.first_player.get.nationality), c.clear_rate, c.completed, c.total_times, c.is_poison, c.oss_image_url, c.oss_image_detail_url))
     })
 }
 

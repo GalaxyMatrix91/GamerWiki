@@ -16,15 +16,15 @@ final case class WikiBackendRoute(webRoot: String, actors: Actors) extends Super
 
   def upload: Route = (post & path(webRoot / "upload" / "course")) {
     entity(as[UploadCourseForm]) { form =>
-      auth { _ =>
+
         WikiActor.ask(form).mapTo[Course]
-      }
+
     }
   }  ~ (post & path(webRoot / "upload" / "maker")) {
     entity(as[UploadMakerForm]) { form =>
-      auth { _ =>
+      //auth { _ =>
         WikiActor.ask(form).mapTo[Maker]
-      }
+      //}
     }
   }
 }

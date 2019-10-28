@@ -28,24 +28,24 @@ import scala.concurrent.ExecutionContext
 
 final case class MakerTable(stag: Tag)(implicit schema: DBSchema) extends Table[Maker](stag, Option(schema.supermm2), "makers") {
   def id = column[String]("maker_id", O.PrimaryKey)
-  def makerName = column[String]("maker_name")
-  def makerPoint = column[Long]("maker_point")
-  def makerAvatar = column[String]("maker_avatar")
-  def makerNationality = column[String]("maker_nationality")
-  def makerProfileImage = column[String]("maker_profile_image")
-  def ecEasyHighScore = column[Long]("ec_easy_high_score")
-  def ecNormalHighScore = column[Long]("ec_normal_high_score")
-  def ecExpertHighScore = column[Long]("ec_expert_high_score")
-  def ecSuperExpertHighScore = column[Long]("ec_super_expert_high_score")
-  def mvWins = column[Long]("mv_wins")
-  def mvPlays = column[Long]("mv_plays")
-  def mcoClears = column[Long]("mco_clears")
-  def mcoPlays = column[Long]("mco_plays")
-  def phCoursesPlayed = column[Long]("ph_courses_played")
-  def phCoursesCleared = column[Long]("ph_courses_cleared")
-  def phAttempts = column[Long]("ph_attempts")
-  def phLivesLost = column[Long]("ph_lives_lost")
-  def versusRatingScore = column[Long]("versus_rating_score")
+  def makerName = column[Option[String]]("maker_name")
+  def makerPoint = column[Option[Long]]("maker_point")
+  def makerAvatar = column[Option[String]]("maker_avatar")
+  def makerNationality = column[Option[String]]("maker_nationality")
+  def makerProfileImage = column[Option[String]]("maker_profile_image")
+  def ecEasyHighScore = column[Option[Long]]("ec_easy_high_score")
+  def ecNormalHighScore = column[Option[Long]]("ec_normal_high_score")
+  def ecExpertHighScore = column[Option[Long]]("ec_expert_high_score")
+  def ecSuperExpertHighScore = column[Option[Long]]("ec_super_expert_high_score")
+  def mvWins = column[Option[Long]]("mv_wins")
+  def mvPlays = column[Option[Long]]("mv_plays")
+  def mcoClears = column[Option[Long]]("mco_clears")
+  def mcoPlays = column[Option[Long]]("mco_plays")
+  def phCoursesPlayed = column[Option[Long]]("ph_courses_played")
+  def phCoursesCleared = column[Option[Long]]("ph_courses_cleared")
+  def phAttempts = column[Option[Long]]("ph_attempts")
+  def phLivesLost = column[Option[Long]]("ph_lives_lost")
+  def versusRatingScore = column[Option[Long]]("versus_rating_score")
   def ossMakerImage = column[Option[String]]("oss_maker_image")
   def ossMakerDetailImage = column[Option[String]]("oss_maker_detail_image")
 
@@ -81,8 +81,8 @@ final class MakerDao(implicit schema: DBSchema, ec: ExecutionContext) {
       ph_attempts = maker.ph_attempts,
       ph_lives_lost = maker.ph_lives_lost,
       versus_rating_score = maker.versus_rating_score,
-      oss_maker_image = maker.oss_maker_image,
-      oss_maker_detail_image = maker.oss_maker_detail_image
+      oss_image_url = maker.oss_image_url,
+      oss_image_detail_url = maker.oss_image_detail_url
     )
     auto += m
   }
@@ -103,7 +103,7 @@ final class MakerDao(implicit schema: DBSchema, ec: ExecutionContext) {
     maker.maker_profile_image, maker.ec_easy_high_score, maker.ec_normal_high_score, maker.ec_expert_high_score,
     maker.ec_super_expert_high_score, maker.mv_wins, maker.mv_plays, maker.mco_clears, maker.mco_plays,
       maker.ph_courses_played, maker.ph_courses_cleared, maker.ph_attempts, maker.ph_lives_lost,
-      maker.oss_maker_image, maker.oss_maker_detail_image)).map(_ > 0)
+      maker.oss_image_url, maker.oss_image_detail_url)).map(_ > 0)
   }
 
   def insertOrUpdate(maker: Maker): DBIO[Maker] =
