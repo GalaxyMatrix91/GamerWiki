@@ -103,8 +103,9 @@ final class WikiUserActor(ctx: Context)(implicit mat: Materializer) extends Acto
     }
   }
 
-  def findCourseByCourseId(form: QueryCourseForm): Future[Option[Course]] =
+  def findCourseByCourseId(form: QueryCourseForm): Future[Option[Course]] = {
     DB.run(CourseDao.findByCourseId(form.course_id))
+  }
 
   def uploadCourse(form: UploadCourseForm): Future[Course] = {
     val q = CourseDao.findByCourseId(form.course.course_id).flatMap {
