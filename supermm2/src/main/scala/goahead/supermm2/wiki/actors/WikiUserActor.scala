@@ -31,6 +31,10 @@ object WikiUserActor {
   final case object GetAllPoisonCourses extends WikiUserMessage
   //按对战积分 降序排列 Maker 官方的
   final case object GetAllMakersByVersusRatingScore extends WikiUserMessage
+
+  final case class FindCoursesForm(course_ids: Seq[String]) extends WikiUserMessage
+
+  final case class FindMakersForm(maker_ids: Seq[String]) extends WikiUserMessage
 }
 
 final class WikiUserActor(ctx: Context)(implicit mat: Materializer) extends ActorTrait {
@@ -51,6 +55,8 @@ final class WikiUserActor(ctx: Context)(implicit mat: Materializer) extends Acto
     case form: QueryMakerForm                 => findMakerByMakerId(form).pipeTo(sender())
     case form: UploadMakerForm                => uploadMaker(form).pipeTo(sender())
     case GetAllMakersByVersusRatingScore      => getAllMakersByVersusRatingScore.pipeTo(sender())
+    case form: FindCoursesForm                => findCoursesByIdSeq(form).pipeTo(sender())
+    case form: FindMakersForm                 => findMakersByIdSeq(form).pipeTo(sender())
     //case form: SignUp                       => signUp(form).pipeTo(sender())           // 注册Admin
   }
 
@@ -82,6 +88,13 @@ final class WikiUserActor(ctx: Context)(implicit mat: Materializer) extends Acto
     DB.runt(q)
   }
 
+  def findCoursesByIdSeq(form: FindCoursesForm) = {
+    DB.run(CourseDao.findByCourseIqSeq(form.course_ids))
+  }
+
+  def findMakersByIdSeq(form: FindMakersForm) = {
+    DB.run(MakerDao.findByMakerIds(form.maker_ids))
+  }
   def getAllMakersByVersusRatingScore: Future[Makers] = {
     DB.run(MakerDao.getAllMakersByVersusRatingScoreDesc()).map {
       makers =>

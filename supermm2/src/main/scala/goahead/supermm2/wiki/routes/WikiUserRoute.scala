@@ -38,6 +38,16 @@ final case class WikiUserRoute(webRoot: String, actors: Actors) extends Supermm2
         entity(as[QueryCourseForm]) { form =>
           WikiActor.ask(form).mapTo[Option[Course]]
         }
+      } ~
+      (post & path(webRoot / "findCourses")) {
+        entity(as[FindCoursesForm]) { form =>
+          WikiActor.ask(form).mapTo[Seq[Course]]
+        }
+      } ~
+      (post & path(webRoot / "findMakers")) {
+        entity(as[FindMakersForm]) { form =>
+          WikiActor.ask(form).mapTo[Seq[Maker]]
+        }
       }
   }
   /*

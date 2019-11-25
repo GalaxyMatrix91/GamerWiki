@@ -93,6 +93,10 @@ final class MakerDao(implicit schema: DBSchema, ec: ExecutionContext) {
   def getAllMakersByVersusRatingScoreDesc(): DBIO[Seq[Maker]] =
     table.sortBy(_.versusRatingScore.desc).result
 
+  def findByMakerIds(makers: Seq[String]): DBIO[Seq[Maker]] = {
+    table.filter(a => a.id inSetBind makers).result
+  }
+
   def update(maker: Maker): DBIO[Boolean] = {
     table.filter(_.id === maker.maker_id).map(a =>
       (a.makerName, a.makerPoint, a.makerAvatar, a.makerNationality, a.makerProfileImage,

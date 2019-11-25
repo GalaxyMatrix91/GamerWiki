@@ -112,6 +112,10 @@ final class CourseDao(implicit schema: DBSchema, ec: ExecutionContext) {
   def findByCourseId(course_id: String): DBIO[Option[Course]] =
     table.filter(_.id === course_id).result.headOption
 
+  def findByCourseIqSeq(courses: Seq[String]): DBIO[Seq[Course]] = {
+    table.filter(a => a.id inSetBind courses).result
+  }
+
   def add(course: Course):DBIO[Course] = {
     val c = Course(
       course_id = course.course_id,
