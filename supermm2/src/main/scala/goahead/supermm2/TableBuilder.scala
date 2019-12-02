@@ -15,7 +15,8 @@ object TableBuilder {
       TableQuery[wiki.tables.AdminTable],
       TableQuery[wiki.tables.RoleTable],
       TableQuery[wiki.tables.MakerTable],
-      TableQuery[wiki.tables.CourseTable]
+      TableQuery[wiki.tables.CourseTable],
+      TableQuery[wiki.tables.GameInfoTable]
     )
   def main(args: Array[String]): Unit = {
     println("Gen SQL File")

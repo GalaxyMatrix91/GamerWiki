@@ -6,3 +6,5 @@ drop table "smm2_wiki"."makers";
 
 drop table "smm2_wiki"."courses";
 
+drop table "smm2_wiki"."game_info";
+

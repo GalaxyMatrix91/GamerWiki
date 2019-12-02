@@ -13,3 +13,5 @@ trait LoginChildMessage extends LoginMessage {
 trait WikiUserMessage extends WikiMessage
 
 trait OssMessage extends WikiMessage
+
+trait GameInfoMessage extends WikiMessage

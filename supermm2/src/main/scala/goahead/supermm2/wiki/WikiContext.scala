@@ -9,4 +9,5 @@ trait WikiContext { self: Context =>
   lazy val MakerDao = new MakerDao()(schema, threads.db)
   lazy val AdminDao = new AdminDao()(schema, threads.db)
   lazy val RoleDao = new RoleDao()(schema, threads.db)
+  lazy val GameInfoDao = new GameInfoDao()(schema, threads.db)
 }
