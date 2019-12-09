@@ -13,11 +13,11 @@ final class GameInfoTable(stag: Tag)(implicit schema: DBSchema) extends Table[Ga
   def gamePosterUrl = column[String]("game_poster_url")
   def gameNameZH = column[String]("game_name_zh")
   def gameNameEN = column[String]("game_name_en")
-  def gameScreenshotsUrl = column[Seq[String]]("game_screenshots_url")
+  def gameScreenshotUrls = column[Seq[String]]("game_screenshots_url")
   def gameMetainfo = column[Json]("game_metainfo")
   def gameDescription = column[String]("game_description")
 
-  def * = (id, gamePosterUrl, gameNameZH, gameNameEN, gameScreenshotsUrl, gameMetainfo,
+  def * = (id, gamePosterUrl, gameNameZH, gameNameEN, gameScreenshotUrls, gameMetainfo,
   gameDescription, state, remark, created_at, updated_at).shaped <> (GameInfo.tupled, GameInfo.unapply)
 }
 

@@ -2,7 +2,7 @@ package goahead.supermm2.wiki.models
 
 import java.time.ZonedDateTime
 
-import goahead.libs.model.{IntMID, StateID}
+import goahead.libs.model.StateID
 import io.circe.Json
 
 /*
@@ -43,7 +43,7 @@ final case class GameInfo (
     game_poster_url: String,
     game_name_zh: String,
     game_name_en: String,
-    game_screenshots_url: Seq[String],
+    game_screenshot_urls: Seq[String],
     game_metainfo: Json,
     game_description: String,
     state: StateID,
@@ -62,7 +62,7 @@ final case class AddGameInfoForm(
       game_poster_url: String,
       game_name_zh: String,
       game_name_en: String,
-      game_screenshots_url: Seq[String],
+      game_screenshot_urls: Seq[String],
       game_metainfo: Json,
       game_description: String,
       remark: Option[String] = None

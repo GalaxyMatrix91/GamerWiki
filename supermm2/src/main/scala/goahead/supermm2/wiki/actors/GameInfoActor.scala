@@ -10,7 +10,6 @@ import goahead.libs.actor.ActorTrait
 import goahead.libs.model.StateID
 import goahead.supermm2.wiki.models.{AddGameInfoForm, GameInfo, GameInfos, QueryAllGameInfo, QueryGameInfoForm}
 
-import scala.concurrent.Future
 import scala.concurrent.duration._
 
 final class GameInfoActor(ctx: Context)(implicit mat: Materializer) extends ActorTrait {
@@ -40,7 +39,7 @@ final class GameInfoActor(ctx: Context)(implicit mat: Materializer) extends Acto
       game_poster_url = req.game_poster_url,
       game_name_zh = req.game_name_zh,
       game_name_en = req.game_name_en,
-      game_screenshots_url = req.game_screenshots_url,
+      game_screenshot_urls = req.game_screenshot_urls,
       game_metainfo = req.game_metainfo,
       game_description = req.game_description,
       state = StateID.Enable,
@@ -59,7 +58,7 @@ final class GameInfoActor(ctx: Context)(implicit mat: Materializer) extends Acto
           game_poster_url = req.game_poster_url,
           game_name_zh = req.game_name_zh,
           game_name_en = req.game_name_en,
-          game_screenshots_url = req.game_screenshots_url,
+          game_screenshot_urls = req.game_screenshot_urls,
           game_metainfo = req.game_metainfo,
           game_description = req.game_description,
           state = gameInfo.state,
@@ -74,7 +73,7 @@ final class GameInfoActor(ctx: Context)(implicit mat: Materializer) extends Acto
           game_poster_url = req.game_poster_url,
           game_name_zh = req.game_name_zh,
           game_name_en = req.game_name_en,
-          game_screenshots_url = req.game_screenshots_url,
+          game_screenshot_urls = req.game_screenshot_urls,
           game_metainfo = req.game_metainfo,
           game_description = req.game_description,
           state = StateID.Enable,
