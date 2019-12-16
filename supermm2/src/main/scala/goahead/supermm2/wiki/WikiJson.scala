@@ -29,6 +29,7 @@ trait WikiJson extends JsonTrait {
   implicit val FindMakersFormJson = Jsons.format[FindMakersForm]
 
   implicit val AddGameInfoFormJson = Jsons.format[AddGameInfoForm]
+  implicit val GameBriefInfoJson = Jsons.format[GameBriefInfo]
   implicit val GameInfoJson = Jsons.format[GameInfo]
   implicit val GameInfosJson = Jsons.format[GameInfos]
 }

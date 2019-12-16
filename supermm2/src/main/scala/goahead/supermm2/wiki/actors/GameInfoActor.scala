@@ -8,7 +8,7 @@ import akka.pattern._
 import akka.stream.Materializer
 import goahead.libs.actor.ActorTrait
 import goahead.libs.model.StateID
-import goahead.supermm2.wiki.models.{AddGameInfoForm, GameInfo, GameInfos, QueryAllGameInfo, QueryGameInfoForm}
+import goahead.supermm2.wiki.models.{AddGameInfoForm, GameBriefInfo, GameInfo, GameInfos, QueryAllGameInfo, QueryGameInfoForm}
 
 import scala.concurrent.duration._
 
@@ -27,8 +27,11 @@ final class GameInfoActor(ctx: Context)(implicit mat: Materializer) extends Acto
     case req: QueryGameInfoForm => findGameInfoById(req).pipeTo(sender())
   }
 
-  def listAllGameInfo =
-    DB.runt(GameInfoDao.listAllGameInfo).map(a => GameInfos(a))
+  def listAllGameInfo = {
+    DB.runt(GameInfoDao.listAllGameInfo).map { gameList =>
+      gameList.map(game => GameBriefInfo(game.id, game.game_name_zh, game.game_name_en))
+    }.map(a => GameInfos(a))
+  }
 
   def findGameInfoById(req: QueryGameInfoForm) =
     DB.runt(GameInfoDao.findById(req.id))

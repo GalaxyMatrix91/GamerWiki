@@ -68,4 +68,10 @@ final case class AddGameInfoForm(
       remark: Option[String] = None
 ) extends GameInfoMessage
 
-final case class GameInfos(gameInfos: Seq[GameInfo])
+final case class GameBriefInfo(
+    id: Long,
+    game_name_zh: String,
+    game_name_en: String
+)
+
+final case class GameInfos(gameBriefInfos: Seq[GameBriefInfo])
