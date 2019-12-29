@@ -40,6 +40,7 @@ updated_at
  */
 final case class GameInfo (
     id: Long,
+    game_index_image_url: String,
     game_poster_url: String,
     game_name_zh: String,
     game_name_en: String,
@@ -59,6 +60,7 @@ final case class QueryGameInfoForm(
 case object QueryAllGameInfo extends GameInfoMessage
 
 final case class AddGameInfoForm(
+      game_index_image_url: String,
       game_poster_url: String,
       game_name_zh: String,
       game_name_en: String,
@@ -70,6 +72,7 @@ final case class AddGameInfoForm(
 
 final case class GameBriefInfo(
     id: Long,
+    game_index_image_url: String,
     game_name_zh: String,
     game_name_en: String
 )

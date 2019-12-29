@@ -10,6 +10,7 @@ import scala.concurrent.ExecutionContext
 final class GameInfoTable(stag: Tag)(implicit schema: DBSchema) extends Table[GameInfo](stag, Option(schema.supermm2), "game_info")
   with BaseTable {
   def id = column[Long]("id", O.PrimaryKey, O.AutoInc)
+  def gameIndexImageUrl = column[String]("game_index_image_url")
   def gamePosterUrl = column[String]("game_poster_url")
   def gameNameZH = column[String]("game_name_zh")
   def gameNameEN = column[String]("game_name_en")
@@ -17,7 +18,7 @@ final class GameInfoTable(stag: Tag)(implicit schema: DBSchema) extends Table[Ga
   def gameMetainfo = column[Json]("game_metainfo")
   def gameDescription = column[String]("game_description")
 
-  def * = (id, gamePosterUrl, gameNameZH, gameNameEN, gameScreenshotUrls, gameMetainfo,
+  def * = (id, gameIndexImageUrl, gamePosterUrl, gameNameZH, gameNameEN, gameScreenshotUrls, gameMetainfo,
   gameDescription, state, remark, created_at, updated_at).shaped <> (GameInfo.tupled, GameInfo.unapply)
 }
 

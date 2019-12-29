@@ -1,4 +1,5 @@
 create table "smm2_wiki"."game_info" ("id" BIGSERIAL NOT NULL PRIMARY KEY,
+  "game_index_image_url" VARCHAR NOT NULL,
   "game_poster_url" VARCHAR NOT NULL,
   "game_name_zh" VARCHAR NOT NULL,
   "game_name_en" VARCHAR NOT NULL,

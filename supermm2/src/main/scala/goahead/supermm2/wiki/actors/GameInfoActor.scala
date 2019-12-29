@@ -8,7 +8,7 @@ import akka.pattern._
 import akka.stream.Materializer
 import goahead.libs.actor.ActorTrait
 import goahead.libs.model.StateID
-import goahead.supermm2.wiki.models.{AddGameInfoForm, GameBriefInfo, GameInfo, GameInfos, QueryAllGameInfo, QueryGameInfoForm}
+import goahead.supermm2.wiki.models._
 
 import scala.concurrent.duration._
 
@@ -29,7 +29,7 @@ final class GameInfoActor(ctx: Context)(implicit mat: Materializer) extends Acto
 
   def listAllGameInfo = {
     DB.runt(GameInfoDao.listAllGameInfo).map { gameList =>
-      gameList.map(game => GameBriefInfo(game.id, game.game_name_zh, game.game_name_en))
+      gameList.map(game => GameBriefInfo(game.id, game.game_index_image_url, game.game_name_zh, game.game_name_en))
     }.map(a => GameInfos(a))
   }
 
@@ -39,6 +39,7 @@ final class GameInfoActor(ctx: Context)(implicit mat: Materializer) extends Acto
   def addGameInfo(req: AddGameInfoForm) = {
     val gameinfo = GameInfo(
       id = 0L,
+      game_index_image_url = req.game_index_image_url,
       game_poster_url = req.game_poster_url,
       game_name_zh = req.game_name_zh,
       game_name_en = req.game_name_en,
@@ -58,6 +59,7 @@ final class GameInfoActor(ctx: Context)(implicit mat: Materializer) extends Acto
       case Some(gameInfo) =>
         val record = GameInfo(
           id = gameInfo.id,
+          game_index_image_url = req.game_index_image_url,
           game_poster_url = req.game_poster_url,
           game_name_zh = req.game_name_zh,
           game_name_en = req.game_name_en,
@@ -73,6 +75,7 @@ final class GameInfoActor(ctx: Context)(implicit mat: Materializer) extends Acto
       case None =>
         val gameInfo = GameInfo(
           id = 0L,
+          game_index_image_url = req.game_index_image_url,
           game_poster_url = req.game_poster_url,
           game_name_zh = req.game_name_zh,
           game_name_en = req.game_name_en,
